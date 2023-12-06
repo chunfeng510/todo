@@ -1,0 +1,46 @@
+<link rel="stylesheet" href="todo.css">
+
+<div id="app">
+    <section class="todo-wrapper">
+      <h1 class="todo-title">{{ today.day }}<br>{{ today.date }}</h1>
+      <form @keydown.enter.prevent="">
+        <input type="text" class="input-todo" v-bind:class="{ active: new_todo }" placeholder="e.g.打掃房間" v-model="new_todo" v-on:keyup.enter="addItem">
+        <div class="btn btn-add" v-bind:class="{ active: new_todo }"  @click="addItem">+</div>
+      </form>
+
+      <div v-if="pending.length > 0">
+        <p class="status busy">有 {{ pending.length }} 個排隊中工作</p>
+        <transition-group name="todo-item" tag="ul" class="todo-list">
+          <li v-for="(item, index) in pending" v-bind:key="item.title">
+            <input class="todo-checkbox" v-bind:id="'item_' + item.id" v-model="item.done" type="checkbox">
+            <label v-bind:for="'item_' + item.id"></label>
+            <span class="todo-text">{{ item.title }}</span>
+            <span class="delete" @click="deleteItem(item)"></span>
+          </li>
+        </transition>  
+      </div> 
+
+      <transition name="slide-fade">
+        <p class="status free" v-if="!pending.length" ><img src="/clean.png" alt="celebration">全部完成，休息時間!</p> 
+      </transition>
+
+      <div v-if="completed.length > 0 && showComplete">
+        <p class="status">已完成任務: {{ completedPercentage }}</p>
+        <transition-group name="todo-item" tag="ul" class="todo-list archived">
+          <li v-for="(item, index) in completed" v-bind:key="item.title">
+            <input class="todo-checkbox" v-bind:id="'item_' + item.id" v-model="item.done" type="checkbox">
+            <label v-bind:for="'item_' + item.id"></label>
+            <span class="todo-text">{{ item.title }}</span>
+            <span class="delete" @click="deleteItem(item)"></span>
+          </li>
+        </transition>  
+      </div>  
+      <div class="control-buttons">
+        <div class="btn btn-secondary" v-if="completed.length > 0" @click="toggleShowComplete"><span v-if="!showComplete">顯示</span><span v-else>隱藏</span>完成項目</div>
+        <div class="btn btn-secondary" v-if="todoList.length > 0" @click="clearAll">清除全部</div>
+      </div>
+    </section>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js"></script>
+  <script src="todo.js"></script>
